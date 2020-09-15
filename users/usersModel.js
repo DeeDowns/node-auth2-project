@@ -1,14 +1,28 @@
 const db = require('../data/db-connection')
 
 module.exports = {
-    // add,
+    add,
     find,
     // findBy,
-    // findById
+    findById
 }
 
 function find() {
     return db('users')
     .select('id', 'username', 'department')
     .orderBy('id')
+}
+
+async function add(user) {
+   try {
+       const [id] = await db('users').insert(user, 'id')
+
+       return findById(id)
+   } catch (error) {
+       throw error
+   }
+}
+
+function findById(id) {
+    return db('users').where({ id }).first()
 }
