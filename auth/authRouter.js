@@ -26,10 +26,37 @@ router.post('/register', (req, res) => {
          })
     } else {
         res.status(400).json({ message: 'proved username and password and passwords should be alphanumeric' })
-    }
-    
+    }  
 
 })
+
+
+router.post('/login', (req, res) => {
+    const { username, password } = req.body
+    if(isValid(req.body)) {
+        Users.findBy({ username: username })
+        .then(([user]) => {
+            console.log(user)
+            if(user && bcrypt.compareSync(password, user.password)) {
+                const token = makeJwt(user)
+                res.status(200).json({ token })
+            }
+       
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({message: 'invalid credentials' })
+        })
+    } else {
+        res.status(400).json({ message: 'proved username and password and passwords should be alphanumeric' })
+    }
+})
+
+
+
+
+
+
 
 function isValid(user) {
     return Boolean(user.username && user.password && typeof user.password === 'string')
